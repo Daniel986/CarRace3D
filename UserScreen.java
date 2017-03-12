@@ -36,7 +36,7 @@ public class UserScreen extends Stage{
 		GridPane gridPane = initGrid();
 		Scene scene = new Scene(gridPane, 500, 200);
 		setScene(scene);
-		setTitle("Gambler registration list");
+		setTitle("Gambler registration panel");
 		setAlwaysOnTop(true);
 		show();
 		btnRegister.setOnAction(e -> {
@@ -75,7 +75,7 @@ public class UserScreen extends Stage{
 		});
 	}
 
-	private boolean checkIsDuplicate(String name) {
+	private boolean checkIsDuplicate(String name) { 
 		ArrayList<Gambler> list = GamblersScreen.getGamblers();
 		for(Gambler d : list){
 			if(d.getName() != null && d.getName().contains(name))

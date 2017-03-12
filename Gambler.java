@@ -2,6 +2,7 @@ package CarRace3D;
 
 public class Gambler {
 
+	private int gamblerId;
 	private float wallet;
 	private String name;
 	

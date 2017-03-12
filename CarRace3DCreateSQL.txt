@@ -1,0 +1,50 @@
+
+
+drop database if exists CarRace;
+create database CarRace;
+use CarRace;
+drop table if exists Gambler;
+drop table if exists Race;
+drop table if exists Gamble;
+drop table if exists Car;
+  
+create table Car (
+  carId integer not null AUTO_INCREMENT, 
+  type varchar(25),
+  size varchar(25),
+  shape varchar(25),
+  color varchar(25),
+  constraint pkCar primary key (carId)
+  );
+  ALTER TABLE Car AUTO_INCREMENT=1;
+  
+create table Race (
+  raceId integer not null AUTO_INCREMENT, 
+  name varchar(25), 
+  startTime date, 
+  constraint pkRace primary key (raceId, startTime)
+  );
+  ALTER TABLE Race AUTO_INCREMENT=10000;
+  
+create table Gambler (
+  gamblerId integer not null AUTO_INCREMENT, 
+  name varchar(25), 
+  wallet float, 
+  constraint pkGambler primary key (gamblerId)
+  );
+  ALTER TABLE Gambler AUTO_INCREMENT=100;
+
+create table Gamble (
+  gambleId integer not null AUTO_INCREMENT, 
+  gamblerId integer, 
+  raceId integer, 
+  carId integer, 
+  amount float, 
+  constraint pkGamble primary key (GamblerId),
+  constraint fkGambler foreign key (GambleId) references Gambler(gamblerId),
+  constraint fkRace foreign key (raceId) references Race(raceId),
+  constraint fkCar foreign key (carId) references Car(carId)
+  );
+  ALTER TABLE Gamble AUTO_INCREMENT=1000;
+  
+

@@ -1,5 +1,8 @@
 package CarRace3D;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import javafx.application.Application;
@@ -27,6 +30,7 @@ public class GamblersScreen extends Application implements Runnable{
 	static ArrayList<Gambler> gamblers = new ArrayList<>();
 	static ArrayList<Gambler> races = new ArrayList<>();
 	Button btnAddGambler, btnGamble, btnRaceHistory, btnGamblerHistory;
+	private Statement stmt;
 	//Methods
 
 	@SuppressWarnings("rawtypes")
@@ -54,8 +58,37 @@ public class GamblersScreen extends Application implements Runnable{
 			}
 		});
 		btnAddGambler.setOnAction(e -> {registerNewGambler();});
+		btnGamble.setOnAction(e -> {gambleScreen();});
 		primaryStage.show(); 
 		primaryStage.setAlwaysOnTop(true);
+		CreateSQL();
+		ConnectSQL();
+	}
+
+	private void ConnectSQL() {
+		try {
+		// Load the JDBC driver
+	      Class.forName("com.mysql.jdbc.Driver");
+	      // Class.forName("oracle.jdbc.driver.OracleDriver");
+	      System.out.println("Driver loaded");
+	      // Establish a connection
+	      Connection connection = DriverManager.getConnection
+	        ("jdbc:mysql://localhost/javabook", "scott", "tiger");
+	      System.out.println("Database connected");
+	      // Create a statement
+	      stmt = connection.createStatement();
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+	}
+
+	private void CreateSQL() {
+		new CreateRaceSQL();
+	}
+
+	private void gambleScreen() {
+		new GambleScreen().gambleScreen();
 	}
 
 	@Override
