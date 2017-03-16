@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -17,12 +18,15 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 
 public class CreateRaceSQL {
+	
+	
 
 	public CreateRaceSQL() {
 		Connection con = null;
 		String url = "jdbc:mysql://localhost/";
 		String db = "";
 		String driver = "com.mysql.jdbc.Driver";
+
 		try {  
 			Class.forName(driver);
 			con = DriverManager.getConnection(url+db,"scott","tiger");
