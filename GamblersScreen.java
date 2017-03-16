@@ -1,5 +1,9 @@
 package CarRace3D;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -9,29 +13,30 @@ import javafx.application.Application;
 import javafx.application.Platform;
 
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class GamblersScreen extends Application implements Runnable{
+public class GamblersScreen extends Application implements Runnable, CarRaceConstants {
 
 	//Fields
 	static ArrayList<Gambler> gamblers = new ArrayList<>();
 	static ArrayList<Gambler> races = new ArrayList<>();
-	Button btnAddGambler, btnGamble, btnRaceHistory, btnGamblerHistory;
+	private Button btnAddGambler, btnGamble, btnRaceHistory, btnGamblerHistory;
 	private Statement stmt;
-	//Methods
+	private Server server = new Server();
+	// Host name or ip
+	private String host = "localhost";
+	// Socket
+	private Socket socketRace1, socketRace2, socketRace3;
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -62,25 +67,49 @@ public class GamblersScreen extends Application implements Runnable{
 		primaryStage.show(); 
 		primaryStage.setAlwaysOnTop(true);
 		CreateSQL();
-		ConnectSQL();
+		connectSQL();
+		new Thread(server).start();
+		getSockets();
+		handleRaces();
 	}
 
-	private void ConnectSQL() {
+	private void handleRaces() {
 		try {
-		// Load the JDBC driver
-	      Class.forName("com.mysql.jdbc.Driver");
-	      // Class.forName("oracle.jdbc.driver.OracleDriver");
-	      System.out.println("Driver loaded");
-	      // Establish a connection
-	      Connection connection = DriverManager.getConnection
-	        ("jdbc:mysql://localhost/javabook", "scott", "tiger");
-	      System.out.println("Database connected");
-	      // Create a statement
-	      stmt = connection.createStatement();
+			DataInputStream fromRace1 = new DataInputStream(socketRace1.getInputStream());
+			DataOutputStream toRace1 = new DataOutputStream(socketRace1.getOutputStream());
+			DataInputStream fromRace2 = new DataInputStream(socketRace2.getInputStream());
+			DataOutputStream toRace2 = new DataOutputStream(socketRace2.getOutputStream());
+			DataInputStream fromRace3 = new DataInputStream(socketRace3.getInputStream());
+			DataOutputStream toRace3 = new DataOutputStream(socketRace3.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void getSockets() {
+		ArrayList<Socket> sockets = server.getSockets();
+		this.socketRace1 = sockets.get(0);
+		this.socketRace2 = sockets.get(1);
+		this.socketRace3 = sockets.get(2);
+	}
+
+	private void connectSQL() {
+		try {
+			// Load the JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+			// Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Driver loaded");
+			// Establish a connection
+			Connection connection = DriverManager.getConnection
+					("jdbc:mysql://localhost/CarRace", "scott", "tiger");
+			System.out.println("Database connected");
+			// Create a statement
+			stmt = connection.createStatement();
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 	}
 
 	private void CreateSQL() {
