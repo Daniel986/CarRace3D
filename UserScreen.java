@@ -62,7 +62,7 @@ public class UserScreen extends Stage{
 					}
 					else{
 						gambler = new Gambler(name, deposit);
-						GamblersScreen.addGamblerToList(gambler);
+						GamblersScreen.addGambler(gambler);
 						btnRegister.setDisable(true);
 						this.close();
 					}

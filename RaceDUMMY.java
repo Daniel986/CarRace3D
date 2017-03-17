@@ -18,8 +18,9 @@ public class RaceDUMMY implements Runnable {
 			      fromServer = new DataInputStream(socket.getInputStream());
 			      // Create an output stream to send data to the server
 			      toServer = new DataOutputStream(socket.getOutputStream());
-			      int player = fromServer.readInt();
+			      int player = fromServer.readInt(); // reading from server
 			      System.out.println(player);
+			      toServer.writeInt(player); // sending to server
 			    }
 			    catch (Exception ex)
 			    { ex.printStackTrace();

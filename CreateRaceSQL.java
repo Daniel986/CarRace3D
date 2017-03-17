@@ -22,15 +22,15 @@ public class CreateRaceSQL {
 	
 
 	public CreateRaceSQL() {
-		Connection con = null;
+		Connection conn = null;
 		String url = "jdbc:mysql://localhost/";
 		String db = "";
 		String driver = "com.mysql.jdbc.Driver";
 
 		try {  
 			Class.forName(driver);
-			con = DriverManager.getConnection(url+db,"scott","tiger");
-			Statement st = con.createStatement();
+			conn = DriverManager.getConnection(url+db,"scott","tiger");
+			Statement st = conn.createStatement();
 
 			File dbFile = new File("CarRace3DCreateSQL.txt");
 			FileInputStream fstream = new FileInputStream(dbFile);
