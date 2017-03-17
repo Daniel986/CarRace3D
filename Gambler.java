@@ -6,6 +6,11 @@ public class Gambler {
 	private float wallet;
 	private String name;
 	
+	public Gambler(int id, String name, float deposit) {
+		this.gamblerId = id;
+		this.name = name;
+		this.wallet = deposit;
+	}
 	public Gambler(String name, float deposit) {
 		this.name = name;
 		this.wallet = deposit;

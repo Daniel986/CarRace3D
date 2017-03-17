@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -29,16 +32,16 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 
 	//Fields
 	static ArrayList<Gambler> gamblers = new ArrayList<>();
-	static ArrayList<Gambler> races = new ArrayList<>();
+	static ArrayList<Race> races = new ArrayList<>();
 	private Button btnAddGambler, btnGamble, btnRaceHistory, btnGamblerHistory;
 	private Statement stmt;
+	private static Connection conn;
 	private Server server = new Server();
 	// Host name or ip
 	private String host = "localhost";
 	// Socket
 	private Socket socketRace1, socketRace2, socketRace3;
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void start(Stage primaryStage) {
 		BorderPane pane = new BorderPane();
@@ -46,7 +49,7 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 		HBox hbButtons = initTopButtons();
 		stylizeButtons();
 		Scene scene = new Scene(pane, 900, 520);
-		TableView table = initTable();
+		TableView<Race> table = initTable();
 		pane.setTop(hbButtons);
 		pane.setCenter(table);
 		primaryStage.setScene(scene); // Place the scene in the stage
@@ -64,6 +67,8 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 		});
 		btnAddGambler.setOnAction(e -> {registerNewGambler();});
 		btnGamble.setOnAction(e -> {gambleScreen();});
+		btnRaceHistory.setOnAction(e -> {raceHistoryScreen();});
+		btnGamblerHistory.setOnAction(e -> {gamblerHistoryScreen();});
 		primaryStage.show(); 
 		primaryStage.setAlwaysOnTop(true);
 		CreateSQL();
@@ -71,6 +76,14 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 		new Thread(server).start();
 		getSockets();
 		handleRaces();
+	}
+
+	private void gamblerHistoryScreen() {
+		new RaceHistoryScreen().raceHistoryScreen(races);
+	}
+
+	private void raceHistoryScreen() {
+		new RaceHistoryScreen().raceHistoryScreen(races);
 	}
 
 	private void handleRaces() {
@@ -81,8 +94,12 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 			DataOutputStream toRace2 = new DataOutputStream(socketRace2.getOutputStream());
 			DataInputStream fromRace3 = new DataInputStream(socketRace3.getInputStream());
 			DataOutputStream toRace3 = new DataOutputStream(socketRace3.getOutputStream());
+			
+			System.out.println(fromRace1.readInt());
+			System.out.println(fromRace2.readInt());
+			System.out.println(fromRace3.readInt());
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -101,13 +118,37 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 			// Class.forName("oracle.jdbc.driver.OracleDriver");
 			System.out.println("Driver loaded");
 			// Establish a connection
-			Connection connection = DriverManager.getConnection
+			conn = DriverManager.getConnection
 					("jdbc:mysql://localhost/CarRace", "scott", "tiger");
 			System.out.println("Database connected");
 			// Create a statement
-			stmt = connection.createStatement();
+			stmt = conn.createStatement();
+			loadGamblers();
+			loadRaces();
 		} catch(Exception ex) {
 			ex.printStackTrace();
+		}
+
+	}
+
+	private void loadRaces() {
+		///////// load only finished races
+		///////// query or querys that fill all relevant race class fields: raceID, name, date, time, gambles, cars
+	}
+
+	private void loadGamblers() {
+		String queryString = "select gamblerId, name, wallet from gambler";
+		ResultSet rset;
+		try {
+			rset = stmt.executeQuery(queryString);
+			while (rset.next()) { 
+				int id = rset.getInt(1);
+				String name = rset.getString(2);
+				float wallet = rset.getFloat(3);
+				gamblers.add(new Gambler(id, name, wallet));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -146,8 +187,8 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private TableView initTable() {
-		TableView table = new TableView();
+	private TableView<Race> initTable() {
+		TableView<Race> table = new TableView<Race>();
 		TableColumn idCol = new TableColumn("Race ID");
 		TableColumn nameCol = new TableColumn("Race Name");
 		TableColumn partCol = new TableColumn("Particaipating Gamblers");
@@ -171,11 +212,20 @@ public class GamblersScreen extends Application implements Runnable, CarRaceCons
 		return gamblers;
 	}
 
-	public static void addGamblerToList(Gambler gambler) {
+	public static void addGambler(Gambler gambler) {
 		if(gambler != null)
 			gamblers.add(gambler);
-		for(Gambler g : gamblers){
-			System.out.println(g.getName() + " " + g.getWallet());
+		// the mysql insert statement
+		String insertGambler = " insert into gambler (gamblerid, name, wallet)"
+				+ " values (NULL, ?, ?)";
+		PreparedStatement preparedStmt;
+		try {
+			preparedStmt = conn.prepareStatement(insertGambler);
+			preparedStmt.setString (1, gambler.getName());
+			preparedStmt.setFloat(2, gambler.getWallet());
+			preparedStmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
 	}
