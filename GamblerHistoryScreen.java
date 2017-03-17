@@ -1,5 +1,9 @@
 package CarRace3D;
 
-public class GamblerHistoryScreen {
+import javafx.stage.Stage;
 
+public class GamblerHistoryScreen extends Stage{
+
+	
+	
 }
