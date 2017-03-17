@@ -14,10 +14,6 @@ import javafx.stage.Stage;
 
 public class CarRace3D {
 
-	private ArrayList<Controller> controllerList;
-	private ArrayList<View> viewList;
-	private ArrayList<Model> modelList;
-
 	public static void main(String[] args) throws Exception {
 		// Start Gamblers screen
 		//Thread server = new Thread(new Server());
