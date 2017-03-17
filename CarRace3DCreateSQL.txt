@@ -1,4 +1,4 @@
-
+Installed
 
 drop database if exists CarRace;
 create database CarRace;
